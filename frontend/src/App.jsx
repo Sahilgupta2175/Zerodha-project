@@ -4,7 +4,10 @@ import HomePage from "./landing_page/home/HomePage";
 
 function App() {
     return (
-        <HomePage />
+        <>
+            <HomePage /> 
+            <i class="fa-solid fa-circle-user"></i>
+        </>
     );
 }
 
