@@ -2,9 +2,9 @@ import React from 'react';
 
 function Stats() {
     return (
-        <div className="container p-3">
-            <div className="row p-5">
-                <div className="col-6 p-5">
+        <div className="container">
+            <div className="row py-5">
+                <div className="col-6 py-5">
                     <h1 className='fs-2 mb-5'>Trust with confidence</h1>
                     <h2 className='fs-4'>Customer-first always</h2>
                     <p className='text-muted'>
@@ -23,8 +23,8 @@ function Stats() {
                         With initiatives like Nudge and Kill Switch, we don't just facilitate transactions, but actively help you do better with your money.
                     </p>
                 </div>
-                <div className="col-6 p-5">
-                    <img src="Images/ecosystem.png" alt="EcoSystem.png" style={{ width: "100%" }} />
+                <div className="col-6 p-3">
+                    <img src="Images/ecosystem.png" alt="EcoSystem.png" style={{ width: "80%" }} />
                     <div className='text-center'>
                         <a href="" className='mx-5' style={{textDecoration:"none"}}>Explore our products <i class="fa-solid fa-arrow-right-long"></i></a>
                         <a href="" style={{textDecoration:"none"}}>Try Kite demo <i class="fa-solid fa-arrow-right-long"></i></a>
