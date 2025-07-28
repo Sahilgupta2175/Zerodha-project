@@ -1,0 +1,10 @@
+.col > a {
+    text-decoration: none;
+    color: #000000;
+}
+
+.container > a {
+    text-decoration: none;
+    margin-right: 20px;
+    font-size: 15px;
+}
