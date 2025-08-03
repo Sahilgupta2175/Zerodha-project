@@ -1,15 +1,16 @@
 import React, {useState} from 'react';
 import './WatchListItem.css';
 import {KeyboardArrowDown, KeyboardArrowUp} from '@mui/icons-material';
+import WatchListActions from './WatchListActions';
 
 function WatchListItem({stock}) {
     const [showWatchListActions, setShowWatchListActions] = useState(false);
 
-    const handleMouseEnter = (event) => {
+    const handleMouseEnter = () => {
         setShowWatchListActions(true);
     }
 
-    const handleMouseLeave = (event) => {
+    const handleMouseLeave = () => {
         setShowWatchListActions(false);
     }
 
@@ -23,6 +24,7 @@ function WatchListItem({stock}) {
                     <span className="price">{stock.price}</span>
                 </div>
             </div>
+            {showWatchListActions && <WatchListActions uid={stock.name} />}
         </li>
     );
 }

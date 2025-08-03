@@ -1,6 +1,5 @@
 import React from 'react';
 import './WatchList.css';
-import {Tooltip, Grow} from '@mui/material';
 import { watchlist } from '../data/data';
 import WatchListItem from './WatchListItem'
 
