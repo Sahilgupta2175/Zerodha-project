@@ -47,3 +47,23 @@
   align-items: center;
   margin-bottom: 2%;
 }
+
+.table {
+  border: 1px solid #ddd;
+  padding: 5% 8%;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.table hr {
+  border: none;
+  background: #d1d1d1;
+  height: 0.5px;
+  margin: 0;
+}
+
+.table .data {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
