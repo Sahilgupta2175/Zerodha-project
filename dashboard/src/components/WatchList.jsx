@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './WatchList.css';
 import {Tooltip, Grow} from '@mui/material';
 import { watchlist } from '../data/data';
+import WatchListItem from './WatchListItem'
 
 function WatchList() {
     return (
@@ -14,7 +15,7 @@ function WatchList() {
             <ul className="list">
                 {
                     watchlist.map((stock, index) => {
-                        <WatchListItem stock={stock} key={index} />
+                        return <WatchListItem stock={stock} key={index} />
                     })
                 }
             </ul>
