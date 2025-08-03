@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './WatchList.css';
+import {Tooltip, Grow} from '@mui/material';
+import { watchlist } from '../data/data';
 
 function WatchList() {
     return (
@@ -7,9 +9,15 @@ function WatchList() {
             <div className="search-container">
                 <input
                     type="text" name="search" id="search" placeholder="Search eg:infy, bse, nifty fut weekly, gold mcx" className="search" />
-                <span className="counts"> 9 / 50</span>
+                <span className="counts"> {watchlist.length} / 50</span>
             </div>
-            <ul className="list"></ul>
+            <ul className="list">
+                {
+                    watchlist.map((stock, index) => {
+                        <WatchListItem stock={stock} key={index} />
+                    })
+                }
+            </ul>
         </div>
     );
 }
