@@ -1,4 +1,5 @@
-import { Schema, Model, Model } from "mongoose";
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
 const PositionsSchema = new Schema({
     product: String,
@@ -11,6 +12,6 @@ const PositionsSchema = new Schema({
     isLoss: Boolean,
 });
 
-const PositionsModel = Model("Position", PositionsSchema);
+const PositionsModel = mongoose.model("Position", PositionsSchema);
 
 module.exports = PositionsModel;

@@ -1,4 +1,5 @@
-import { Schema, Model } from 'mongoose';
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 const HoldingsSchema = new Schema({
     name: String,
@@ -9,6 +10,6 @@ const HoldingsSchema = new Schema({
     day: String,
 });
 
-const HoldingsModel = Model("Holding", HoldingsSchema);
+const HoldingsModel = mongoose.model("Holding", HoldingsSchema);
 
 module.exports = HoldingsModel;

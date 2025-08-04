@@ -1,4 +1,5 @@
-import { Schema, Model } from "mongoose";
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
 const OrdersSchema = new Schema({
     name: String,
@@ -7,6 +8,6 @@ const OrdersSchema = new Schema({
     mode: String,
 });
 
-const OrdersModel = Model("Order", OrdersSchema);
+const OrdersModel = mongoose.model("Order", OrdersSchema);
 
 module.exports = OrdersModel;
