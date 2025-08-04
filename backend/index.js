@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const PORT = process.env.PORT;
+const bodyParser = require('body-parser');
+const cors = require('cors');
 const dbURL = require("./config/mongoConnection");
 const Holdings = require('./model/Holdings');
 const Positions = require('./model/Positions');
@@ -10,6 +12,9 @@ const positionSampleData = require('./SampleData/PositionSampleData');
 
 // Connect to database
 dbURL();
+
+app.use(cors());
+app.use(bodyParser.json());
 
 // Index Route
 app.get('/', (req, res) => {
@@ -56,6 +61,18 @@ app.get('/addPositions', async (req, res) => {
     });
 
     res.send("Positions Sample Data added Successfully."); 
+});
+
+// Showing all Holdings to the user
+app.get('/allHoldings', async (req, res) => {
+    let allHoldings = await Holdings.find({});
+    res.json(allHoldings);
+});
+
+// Showing all Postions to the user
+app.get('/allPositions', async (req, res) => {
+    let allPositions = await Positions.find({});
+    res.json(allPositions);
 });
 
 app.listen(PORT, () => {
