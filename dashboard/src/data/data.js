@@ -190,5 +190,4 @@ export const positions = [
   	  day: "-1.35%",
   	  isLoss: true,
   	},
-];	
-	
+];
