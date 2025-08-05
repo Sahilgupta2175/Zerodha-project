@@ -2,23 +2,23 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
-import "./SignUp.css";
+import "./login.css";
 
-function SignUp() {
+function Login() {
     const navigate = useNavigate();
     const [inputValue, setInputValue] = useState({
         email: "",
         password: "",
-        username: "",
     });
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [rememberMe, setRememberMe] = useState(false);
     const [errors, setErrors] = useState({});
 
-    const { email, password, username } = inputValue;
+    const { email, password } = inputValue;
 
-    const handleOnChange = (e) => {
-        const { name, value } = e.target;
+    const handleOnChange = (event) => {
+        const { name, value } = event.target;
         setInputValue({
             ...inputValue,
             [name]: value,
@@ -36,12 +36,6 @@ function SignUp() {
     const validateForm = () => {
         const newErrors = {};
         
-        if (!username.trim()) {
-            newErrors.username = "Username is required";
-        } else if (username.length < 3) {
-            newErrors.username = "Username must be at least 3 characters";
-        }
-        
         if (!email.trim()) {
             newErrors.email = "Email is required";
         } else if (!/\S+@\S+\.\S+/.test(email)) {
@@ -50,8 +44,6 @@ function SignUp() {
         
         if (!password) {
             newErrors.password = "Password is required";
-        } else if (password.length < 6) {
-            newErrors.password = "Password must be at least 6 characters";
         }
         
         setErrors(newErrors);
@@ -80,35 +72,55 @@ function SignUp() {
         setIsLoading(true);
         
         try {
-            console.log("Attempting signup with:", { email, username, password: "***" });
+            console.log("Attempting login with:", { email, password: "***" });
             const { data } = await axios.post(
-                "http://localhost:8080/signup", 
+                "http://localhost:8080/login", 
                 { ...inputValue }, 
                 { withCredentials: true }
             );
             
-            console.log("Signup response:", data);
+            console.log("Login response:", data);
             const { success, message } = data;
 
             if (success) {
                 handleSuccess(message);
                 setTimeout(() => {
-                    navigate("/login");
+                    window.location.href = "http://localhost:5173/dashboard";
                 }, 1000);
             } else {
-                handleError(message);
+                if (message && message.toLowerCase().includes('user not found') || 
+                    message && message.toLowerCase().includes('no user found') ||
+                    message && message.toLowerCase().includes('incorrect password or email')) {
+                    
+                    handleError("Account not found. Redirecting to signup...");
+                    setTimeout(() => {
+                        navigate('/signup');
+                    }, 2000);
+                } else {
+                    handleError(message);
+                }
             }
         } catch (error) {
-            console.error("Signup error:", error);
+            console.error("Login error:", error);
             console.error("Error details:", error.response?.data);
             console.error("Error status:", error.response?.status);
             console.error("Error message:", error.message);
             
-            const errorMessage = error.response?.data?.message || error.message || "Failed to create account. Please try again.";
-            handleError(errorMessage);
+            const errorMessage = error.response?.data?.message || error.message || "Failed to login. Please check your credentials.";
             
-            // Also show an alert for immediate visibility
-            alert(`Signup failed: ${errorMessage}`);
+            if (error.response?.status === 404 || 
+                errorMessage.toLowerCase().includes('user not found') ||
+                errorMessage.toLowerCase().includes('no user found') ||
+                errorMessage.toLowerCase().includes('user does not exist')) {
+                
+                handleError("Account not found. Redirecting to signup page...");
+                setTimeout(() => {
+                    navigate('/signup');
+                }, 2000);
+            } else {
+                handleError(errorMessage);
+                alert(`Login failed: ${errorMessage}`);
+            }
         } finally {
             setIsLoading(false);
         }
@@ -119,41 +131,21 @@ function SignUp() {
     };
 
     return (
-        <div className="signup-container">
-            <div className="signup-card">
-                <div className="signup-header">
+        <div className="login-container">
+            <div className="login-card">
+                <div className="login-header">
                     <img 
                         src="/Images/logo.svg" 
                         alt="Zerodha" 
                         className="logo"
                     />
-                    <h1 className="signup-title">Create Account</h1>
-                    <p className="signup-subtitle">
-                        Join thousands of traders and start your investment journey
+                    <h1 className="login-title">Welcome Back</h1>
+                    <p className="login-subtitle">
+                        Sign in to your account to continue trading
                     </p>
                 </div>
 
-                <form className="signup-form" onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="username" className="form-label">
-                            Username
-                        </label>
-                        <input
-                            type="text"
-                            id="username"
-                            name="username"
-                            className={`form-input ${errors.username ? 'error' : ''}`}
-                            placeholder="Enter your username"
-                            value={username}
-                            onChange={handleOnChange}
-                        />
-                        {errors.username && (
-                            <div className="field-error">
-                                ⚠️ {errors.username}
-                            </div>
-                        )}
-                    </div>
-
+                <form className="login-form" onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label htmlFor="email" className="form-label">
                             Email Address
@@ -184,7 +176,7 @@ function SignUp() {
                                 id="password"
                                 name="password"
                                 className={`form-input ${errors.password ? 'error' : ''}`}
-                                placeholder="Create a strong password"
+                                placeholder="Enter your password"
                                 value={password}
                                 onChange={handleOnChange}
                             />
@@ -203,19 +195,38 @@ function SignUp() {
                         )}
                     </div>
 
+                    <div className="form-options">
+                        <label className="remember-me">
+                            <input
+                                type="checkbox"
+                                checked={rememberMe}
+                                onChange={(e) => setRememberMe(e.target.checked)}
+                            />
+                            Remember me
+                        </label>
+                        <Link to="/forgot-password" className="forgot-password">
+                            Forgot password?
+                        </Link>
+                    </div>
+
                     <button
                         type="submit"
-                        className={`signup-button ${isLoading ? 'loading' : ''}`}
+                        className={`login-button ${isLoading ? 'loading' : ''}`}
                         disabled={isLoading}
                     >
-                        {isLoading ? '' : 'Create Account'}
+                        {isLoading ? '' : 'Sign In'}
                     </button>
                 </form>
 
-                <div className="signup-footer">
-                    Already have an account?{' '}
-                    <Link to="/login" className="login-link">
-                        Sign in here
+                <div className="login-footer">
+                    <div className="login-notice">
+                        <small>
+                            📌 Don't have an account? You'll be automatically redirected to signup if your email isn't found.
+                        </small>
+                    </div>
+                    Don't have an account?{' '}
+                    <Link to="/signup" className="signup-link">
+                        Create one here
                     </Link>
                 </div>
             </div>
@@ -225,4 +236,4 @@ function SignUp() {
     );
 }
 
-export default SignUp;
+export default Login;

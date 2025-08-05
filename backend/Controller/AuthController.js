@@ -40,14 +40,19 @@ const login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         if(!email || !password ){
-            return res.json({message:'All fields are required'});
+            return res.status(400).json({message:'All fields are required', success: false});
         }
 
         const user = await User.findOne({ email });
-        const auth = await bcrypt.compare(password,user.password);
+        
+        if (!user) {
+            return res.status(404).json({message:'User not found. Please sign up first.', success: false});
+        }
+        
+        const auth = await bcrypt.compare(password, user.password);
 
-        if(!user || !auth){
-            return res.json({message:'Incorrect password or email' }); 
+        if (!auth) {
+            return res.status(401).json({message:'Incorrect password', success: false}); 
         }
 
         const token = secretToken(user._id);
@@ -56,10 +61,11 @@ const login = async (req, res, next) => {
             httpOnly: false,
         });
 
-        res.status(201).json({ message: "User logged in successfully", success: true });
+        res.status(200).json({ message: "User logged in successfully", success: true });
         next();
     } catch (error) {
         console.log(error);
+        res.status(500).json({ message: "Internal server error", success: false });
     }
 }
 

@@ -16,9 +16,6 @@ function Navbar() {
                     <form>
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             <li class="nav-item">
-                                <Link class="nav-link active" to="/signup">Signup</Link>
-                            </li>
-                            <li class="nav-item">
                                 <Link class="nav-link active" to="/about">About</Link>
                             </li>
                             <li class="nav-item">
@@ -29,6 +26,12 @@ function Navbar() {
                             </li>
                             <li class="nav-item">
                                 <Link class="nav-link active" to="/support">Support</Link>
+                            </li>
+                            <li class="nav-item">
+                                <Link class="nav-link active" to="/signup">Signup</Link>
+                            </li>
+                            <li class="nav-item">
+                                <Link class="nav-link active" to="/login">Login</Link>
                             </li>
                         </ul>
                     </form>
