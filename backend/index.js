@@ -10,12 +10,19 @@ const Orders = require('./model/Orders');
 const Positions = require('./model/Positions');
 const holdingSampleData = require('./SampleData/HoldingSampleData');
 const positionSampleData = require('./SampleData/PositionSampleData');
+const cookieParser = require('cookie-parser');
+const authRoute = require('./Routes/AuthRoute');
 
 // Connect to database
 dbURL();
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// Auth routes should be registered early
+app.use('/', authRoute);
 
 // Index Route
 app.get('/', (req, res) => {
@@ -145,20 +152,6 @@ app.get('/allOrders', async (req, res) => {
 app.get('/allPositions', async (req, res) => {
     let allPositions = await Positions.find({});
     res.json(allPositions);
-});
-
-// 
-app.post('/newOrder', async (req, res) => {
-    let newOrder = new Orders({
-        name: req.body.name,
-        qty: req.body.Number,
-        price: req.body.price,
-        mode: req.body.mode,
-    });
-
-    newOrder.save();
-
-    res.send("Order Saved Successfully");
 });
 
 app.listen(PORT, () => {
