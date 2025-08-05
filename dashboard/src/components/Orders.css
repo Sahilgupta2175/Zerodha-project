@@ -99,6 +99,19 @@
   color: rgb(250, 118, 78);
 }
 
+/* Buy/Sell Mode Styles */
+.order-table td.buy-mode {
+  color: rgb(72, 194, 55);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.order-table td.sell-mode {
+  color: rgb(250, 118, 78);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
 .item:hover {
   cursor: pointer;
 }

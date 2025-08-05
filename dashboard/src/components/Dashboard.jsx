@@ -8,11 +8,14 @@ import Orders from "./Orders";
 import Positions from "./Positions";
 import Summary from "./Summary";
 import WatchList from "./WatchList";
+import GeneralContent from './GeneralContent';
 
 function Dashboard() {
     return (
         <div className="dashboard-container">
-            <WatchList />
+            <GeneralContent>
+                <WatchList />
+            </GeneralContent>
             <div className="content">
                 <Routes>
                     <Route exact path="/" element={<Summary />} />

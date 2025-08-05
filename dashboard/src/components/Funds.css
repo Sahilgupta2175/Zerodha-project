@@ -15,18 +15,42 @@
 .btn {
   text-decoration: none;
   padding: 10px 20px;
-  border-radius: 2px;
-  color: #fff;
-  margin-right: 2px;
-  margin-left: 2px;
+  border-radius: 6px;
+  color: #fff !important;
+  margin-right: 6px;
+  margin-left: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .btn-green {
-  background: #4caf50;
+  background: #22c55e !important;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+
+.btn-green:hover {
+  background: #16a34a !important;
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.4);
 }
 
 .btn-blue {
-  background: #4184f3;
+  background: #4184f3 !important;
+  box-shadow: 0 2px 8px rgba(65, 132, 243, 0.3);
+}
+
+.btn-blue:hover {
+  background: #3b82f6 !important;
+  box-shadow: 0 4px 16px rgba(65, 132, 243, 0.4);
 }
 
 .row {
