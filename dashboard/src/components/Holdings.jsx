@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Holdings.css';
 import axios from 'axios';
+import VerticalGraph from './VerticalGraph';
 
 function Holdings() {
     let [allHoldings, setAllHoldings] = useState([]);
@@ -11,7 +12,7 @@ function Holdings() {
         }).catch((err) => {
             console.log(err);
         });
-    }, [])
+    }, []);
 
     return (
         <>
@@ -67,6 +68,7 @@ function Holdings() {
                     <p>P&L</p>
                 </div>
             </div>
+            <VerticalGraph />
         </>
     );
 }
