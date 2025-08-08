@@ -90,10 +90,14 @@ function SignUp() {
             const { success, message } = data;
 
             if (success) {
+                console.log("Signup successful, preparing redirect...");
+                console.log("Dashboard URL:", import.meta.env.VITE_DASHBOARD_URL);
+                
                 handleSuccess("Account created successfully! Redirecting to dashboard...");
                 setTimeout(() => {
-                    // Redirect to dashboard after successful signup
-                    window.location.href = `${import.meta.env.VITE_DASHBOARD_URL}/`;
+                    const dashboardUrl = import.meta.env.VITE_DASHBOARD_URL || 'https://zerodha-dashboard-sg.vercel.app';
+                    console.log("Redirecting to:", dashboardUrl);
+                    window.location.href = dashboardUrl;
                 }, 1500);
             } else {
                 handleError(message);
