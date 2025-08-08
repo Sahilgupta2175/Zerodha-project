@@ -2,6 +2,13 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 8080;
+
+// Environment variable validation
+console.log('Environment variables check:');
+console.log('PORT:', PORT);
+console.log('ATLAS_DB_URL:', process.env.ATLAS_DB_URL ? 'Set' : 'Not set');
+console.log('TOKEN_KEY:', process.env.TOKEN_KEY ? 'Set' : 'Not set');
+
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const connectDB = require("./config/mongoConnection");
@@ -35,7 +42,24 @@ app.use('/', authRoute);
 
 // Index Route
 app.get('/', (req, res) => {
-    res.send("Hi, I am root Route");
+    res.json({ 
+        message: "Hi, I am root Route",
+        status: "Server is running",
+        env: {
+            PORT: PORT,
+            hasDbUrl: !!process.env.ATLAS_DB_URL,
+            hasTokenKey: !!process.env.TOKEN_KEY
+        }
+    });
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ 
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+    });
 });
 
 // Adding Holdings Sample Data Route
@@ -185,15 +209,19 @@ app.get('/allPositions', async (req, res) => {
     }
 });
 
-// Start server only after database connection is established
+// Start server and connect to database
 async function startServer() {
     try {
-        // Connect to database first
-        await connectDB();
-        
-        // Start the server after successful database connection
+        // Start the server first
         app.listen(PORT, () => {
             console.log(`Server is running on port http://localhost:${PORT}`);
+        });
+
+        // Then connect to database (non-blocking)
+        connectDB().then(() => {
+            console.log('Database connected after server start');
+        }).catch((error) => {
+            console.error('Database connection failed, but server is still running:', error);
         });
     } catch (error) {
         console.error('Failed to start server:', error);
