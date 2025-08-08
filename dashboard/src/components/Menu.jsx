@@ -111,7 +111,7 @@ function Menu() {
                 </div>
                 {isProfileDropDownOpen && (
                     <div className="profile-dropdown">
-                        <p>{user.email}</p>
+                        <p>{user.username}</p>
                         <button onClick={() => {
                             // Add logout functionality here
                             document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
