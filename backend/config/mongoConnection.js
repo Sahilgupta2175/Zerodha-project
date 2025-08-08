@@ -4,57 +4,54 @@ const dbURL = process.env.ATLAS_DB_URL;
 
 console.log('Database URL check:', dbURL ? 'URL provided' : 'URL missing');
 
-// Connection options to handle timeouts and improve reliability
+// Connection options optimized for serverless
 const connectionOptions = {
     bufferCommands: false,
-    serverSelectionTimeoutMS: 30000, // 30 seconds
-    socketTimeoutMS: 45000, // 45 seconds
-    maxPoolSize: 10,
+    serverSelectionTimeoutMS: 10000, // Reduced to 10 seconds for serverless
+    socketTimeoutMS: 20000, // Reduced to 20 seconds
+    maxPoolSize: 1, // Reduced for serverless
     retryWrites: true,
     retryReads: true,
-    connectTimeoutMS: 30000, // 30 seconds
+    connectTimeoutMS: 10000, // Reduced to 10 seconds
 };
 
-main().then(() => {
-    console.log('MongoDB connected successfully');
-}).catch((err) => {
-    console.error('MongoDB connection error:', err);
-    // Don't exit process in serverless environment
-    // process.exit(1);
-});
+// Global connection promise to reuse connections
+let cachedConnection = null;
 
-async function main() {
+async function connectDB() {
+    if (!dbURL) {
+        throw new Error('ATLAS_DB_URL environment variable is not set');
+    }
+
+    // If we have a cached connection and it's connected, return it
+    if (cachedConnection && mongoose.connection.readyState === 1) {
+        console.log('Using existing database connection');
+        return cachedConnection;
+    }
+
     try {
-        if (!dbURL) {
-            throw new Error('ATLAS_DB_URL environment variable is not set');
-        }
+        console.log('Creating new database connection...');
+        cachedConnection = await mongoose.connect(dbURL, connectionOptions);
         
-        await mongoose.connect(dbURL, connectionOptions);
-        
-        // Handle connection events
         mongoose.connection.on('connected', () => {
             console.log('Mongoose connected to MongoDB Atlas');
         });
         
         mongoose.connection.on('error', (err) => {
-            console.log('Mongoose connection error:', err);
+            console.error('Mongoose connection error:', err);
         });
         
         mongoose.connection.on('disconnected', () => {
             console.log('Mongoose disconnected from MongoDB Atlas');
+            cachedConnection = null;
         });
-        
-        // Handle app termination
-        process.on('SIGINT', async () => {
-            await mongoose.connection.close();
-            console.log('Mongoose connection closed through app termination');
-            process.exit(0);
-        });
-        
+
+        return cachedConnection;
     } catch (error) {
         console.error('Failed to connect to MongoDB:', error);
+        cachedConnection = null;
         throw error;
     }
 }
 
-module.exports = main;
+module.exports = connectDB;

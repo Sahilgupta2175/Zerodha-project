@@ -1,8 +1,9 @@
 require('dotenv').config();
 const User = require("../model/User");
 const jwt = require('jsonwebtoken');
+const connectDB = require('../config/mongoConnection');
 
-const userVerification = (req, res) => {
+const userVerification = async (req, res) => {
     const token = req.cookies.token || req.headers.authorization?.split(' ')[1] || req.body.token;
     
     if (!token) {
@@ -16,6 +17,9 @@ const userVerification = (req, res) => {
         }
         
         try {
+            // Ensure database connection
+            await connectDB();
+            
             const user = await User.findById(data.id);
             if (user) {
                 return res.json({ 

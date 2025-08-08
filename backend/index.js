@@ -88,6 +88,7 @@ app.get('/db-test', async (req, res) => {
 // Adding Holdings Sample Data Route
 app.get("/addHoldings", async (req, res) => {
     try {
+        await connectDB();
         let tempHolding = holdingSampleData;
 
         const promises = tempHolding.map(async (item) => {
@@ -142,6 +143,7 @@ app.get('/addPositions', async (req, res) => {
 // Showing all Holdings to the user
 app.get('/allHoldings', async (req, res) => {
     try {
+        await connectDB();
         let allHoldings = await Holdings.find({});
         res.json(allHoldings);
     } catch (error) {
@@ -232,7 +234,7 @@ app.get('/allPositions', async (req, res) => {
     }
 });
 
-// Start server and connect to database
+// Start server 
 async function startServer() {
     try {
         // Start the server first
@@ -240,12 +242,7 @@ async function startServer() {
             console.log(`Server is running on port http://localhost:${PORT}`);
         });
 
-        // Then connect to database (non-blocking)
-        connectDB().then(() => {
-            console.log('Database connected after server start');
-        }).catch((error) => {
-            console.error('Database connection failed, but server is still running:', error);
-        });
+        console.log('Server started successfully. Database connections will be made on-demand.');
     } catch (error) {
         console.error('Failed to start server:', error);
         process.exit(1);

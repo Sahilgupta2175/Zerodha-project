@@ -1,10 +1,15 @@
 const User = require('../model/User');
 const secretToken = require('../utils/SecretToken');
 const bcrypt = require('bcrypt');
+const connectDB = require('../config/mongoConnection');
 
 const signup = async (req, res, next) => {
     try {
         console.log("Signup attempt - Request body:", req.body);
+        
+        // Ensure database connection
+        await connectDB();
+        
         const { email, password, username, createdAt } = req.body;
         
         if (!email || !password || !username) {
@@ -45,6 +50,9 @@ const signup = async (req, res, next) => {
 const login = async (req, res, next) => {
     try {
         console.log("Login attempt - Request body:", { email: req.body.email, hasPassword: !!req.body.password });
+        
+        // Ensure database connection
+        await connectDB();
         
         const { email, password } = req.body;
         if(!email || !password ){
