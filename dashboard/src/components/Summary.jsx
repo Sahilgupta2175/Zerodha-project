@@ -52,6 +52,15 @@ function Summary() {
                 </div>
                 <hr className="divider" />
             </div>
+
+            <div className="section">
+                <span>
+                    <p>Live Market Overview</p>
+                </span>
+                <div style={{ padding: '10px', color: '#666', fontSize: '12px' }}>
+                    Market data unavailable
+                </div>
+            </div>
         </>
     );
 }

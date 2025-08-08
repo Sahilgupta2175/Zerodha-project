@@ -74,7 +74,7 @@ function Login() {
         try {
             console.log("Attempting login with:", { email, password: "***" });
             const { data } = await axios.post(
-                "http://localhost:8080/login", 
+                `${import.meta.env.VITE_BACKEND_URL}/login`, 
                 { ...inputValue }, 
                 { withCredentials: true }
             );

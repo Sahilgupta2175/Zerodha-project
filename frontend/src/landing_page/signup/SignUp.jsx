@@ -82,7 +82,7 @@ function SignUp() {
         try {
             console.log("Attempting signup with:", { email, username, password: "***" });
             const { data } = await axios.post(
-                "http://localhost:8080/signup", 
+                `${import.meta.env.VITE_BACKEND_URL}/signup`, 
                 { ...inputValue }, 
                 { withCredentials: true }
             );

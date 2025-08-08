@@ -7,32 +7,27 @@ function BuyActionsWindow({ uid, price }) {
     const [stockQuantity, setStockQuantity] = useState(1);
     const [stockPrice, setStockPrice] = useState(0.0);
     const [actualPrice, setActualPrice] = useState(0.0);
-    const [priceVariation, setPriceVariation] = useState(0); // Percentage variation from actual price
+    const [priceVariation, setPriceVariation] = useState(0);
     const { closeBuyWindow } = useContext(GeneralContext);
 
-    // Initialize with actual price when component mounts
     useEffect(() => {
         if (price) {
             setActualPrice(parseFloat(price));
             setStockPrice(parseFloat(price));
         } else {
-            // Fetch current price from watchlist data or set a default
-            setActualPrice(100); // Default price if none provided
+            setActualPrice(100);
             setStockPrice(100);
         }
     }, [price]);
 
-    // Calculate margin required
-    const marginRequired = (stockPrice * stockQuantity * 0.20).toFixed(2); // 20% margin
+    const marginRequired = (stockPrice * stockQuantity * 0.20).toFixed(2);
 
-    // Handle price variation
     const handlePriceChange = (variation) => {
         const newPrice = actualPrice * (1 + variation / 100);
         setStockPrice(newPrice);
         setPriceVariation(variation);
     };
 
-    // Quick price adjustment buttons
     const priceAdjustments = [
         { label: "-5%", value: -5 },
         { label: "-2%", value: -2 },
@@ -55,7 +50,7 @@ function BuyActionsWindow({ uid, price }) {
                 return;
             }
             
-            const response = await axios.post("http://localhost:8080/newOrder", {
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/newOrder`, {
                 name: uid,
                 qty: stockQuantity,
                 price: stockPrice,
@@ -78,7 +73,7 @@ function BuyActionsWindow({ uid, price }) {
     const handleSellClick = async () => {
         try {
             // First, check if the stock exists in holdings
-            const holdingsResponse = await axios.get("http://localhost:8080/allHoldings");
+            const holdingsResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/allHoldings`);
             const holdings = holdingsResponse.data;
             
             // Find the specific stock in holdings
@@ -96,7 +91,7 @@ function BuyActionsWindow({ uid, price }) {
             }
             
             // Proceed with sell order if validation passes
-            const response = await axios.post("http://localhost:8080/newOrder", {
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/newOrder`, {
                 name: uid,
                 qty: stockQuantity,
                 price: stockPrice,
@@ -158,7 +153,6 @@ function BuyActionsWindow({ uid, price }) {
                             onChange={(e) => {
                                 const newPrice = parseFloat(e.target.value) || 0;
                                 setStockPrice(newPrice);
-                                // Calculate variation from actual price
                                 const variation = actualPrice > 0 ? ((newPrice - actualPrice) / actualPrice) * 100 : 0;
                                 setPriceVariation(variation);
                             }}
@@ -167,7 +161,6 @@ function BuyActionsWindow({ uid, price }) {
                     </fieldset>
                 </div>
 
-                {/* Quick Price Adjustment Buttons */}
                 <div className="price-adjustments">
                     <label>Quick Price Adjust:</label>
                     <div className="adjustment-buttons">
@@ -184,7 +177,6 @@ function BuyActionsWindow({ uid, price }) {
                     </div>
                 </div>
 
-                {/* Order Summary */}
                 <div className="order-summary">
                     <div className="summary-row">
                         <span>Quantity:</span>

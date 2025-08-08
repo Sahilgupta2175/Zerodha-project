@@ -4,7 +4,7 @@ const app = express();
 const PORT = process.env.PORT;
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const dbURL = require("./config/mongoConnection");
+const connectDB = require("./config/mongoConnection");
 const Holdings = require('./model/Holdings');
 const Orders = require('./model/Orders');
 const Positions = require('./model/Positions');
@@ -12,9 +12,6 @@ const holdingSampleData = require('./SampleData/HoldingSampleData');
 const positionSampleData = require('./SampleData/PositionSampleData');
 const cookieParser = require('cookie-parser');
 const authRoute = require('./Routes/AuthRoute');
-
-// Connect to database
-dbURL();
 
 // Configure CORS to allow frontend
 app.use(cors({
@@ -38,50 +35,67 @@ app.get('/', (req, res) => {
 
 // Adding Holdings Sample Data Route
 app.get("/addHoldings", async (req, res) => {
-    let tempHolding = holdingSampleData;
+    try {
+        let tempHolding = holdingSampleData;
 
-    tempHolding.forEach((item) => {
-        let newHolding = new Holdings({
-            name: item.name,
-            qty: item.qty,
-            avg: item.avg,
-            price: item.price,
-            net: item.net,
-            day: item.day,
+        const promises = tempHolding.map(async (item) => {
+            let newHolding = new Holdings({
+                name: item.name,
+                qty: item.qty,
+                avg: item.avg,
+                price: item.price,
+                net: item.net,
+                day: item.day,
+            });
+
+            return await newHolding.save();
         });
 
-        newHolding.save();
-    });
-    
-    res.send("Holdings Sample Data added Successfully."); 
+        await Promise.all(promises);
+        res.send("Holdings Sample Data added Successfully."); 
+    } catch (error) {
+        console.error("Error adding holdings:", error);
+        res.status(500).json({ error: "Failed to add holdings data" });
+    }
 });
 
 // Adding Positions Sample Data Route
 app.get('/addPositions', async (req, res) => {
-    let tempPosition = positionSampleData;
+    try {
+        let tempPosition = positionSampleData;
 
-    tempPosition.forEach((item) => {
-        let newPosition = new Positions({
-            product: item.product,
-            name: item.name,
-            qty: item.qty,
-            avg: item.avg,
-            price: item.price,
-            net: item.net,
-            day: item.day,
-            isLoss: item.isLoss,
+        const promises = tempPosition.map(async (item) => {
+            let newPosition = new Positions({
+                product: item.product,
+                name: item.name,
+                qty: item.qty,
+                avg: item.avg,
+                price: item.price,
+                net: item.net,
+                day: item.day,
+                isLoss: item.isLoss,
+            });
+
+            return await newPosition.save();
         });
 
-        newPosition.save();
-    });
-
-    res.send("Positions Sample Data added Successfully."); 
+        await Promise.all(promises);
+        res.send("Positions Sample Data added Successfully."); 
+    } catch (error) {
+        console.error("Error adding positions:", error);
+        res.status(500).json({ error: "Failed to add positions data" });
+    }
 });
 
 // Showing all Holdings to the user
 app.get('/allHoldings', async (req, res) => {
-    let allHoldings = await Holdings.find({});
-    res.json(allHoldings);
+    try {
+        let allHoldings = await Holdings.find({});
+        res.json(allHoldings);
+    } catch (error) {
+        console.error("Error fetching holdings:", error);
+        res.status(500).json({ error: "Failed to fetch holdings" });
+    }
 });
 
 // Create new order
@@ -157,10 +171,30 @@ app.get('/allOrders', async (req, res) => {
 
 // Showing all Postions to the user
 app.get('/allPositions', async (req, res) => {
-    let allPositions = await Positions.find({});
-    res.json(allPositions);
+    try {
+        let allPositions = await Positions.find({});
+        res.json(allPositions);
+    } catch (error) {
+        console.error("Error fetching positions:", error);
+        res.status(500).json({ error: "Failed to fetch positions" });
+    }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port http://localhost:${PORT}`);
-});
+// Start server only after database connection is established
+async function startServer() {
+    try {
+        // Connect to database first
+        await connectDB();
+        
+        // Start the server after successful database connection
+        app.listen(PORT, () => {
+            console.log(`Server is running on port http://localhost:${PORT}`);
+        });
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+}
+
+// Start the application
+startServer();

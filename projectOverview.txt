@@ -1,7 +1,0 @@
-Tools required: - VS code, Chrome, Nodejs, Git, Github
-Frontend required: - Html, CSS, JS, Reactjs, Bootstrap, Material UI
-Backend required: - Nodejs, Expressjs
-Database required: - MongoDB
-Testing required: - Jest
-Deployment required: - AWS
-Github required: - Github
