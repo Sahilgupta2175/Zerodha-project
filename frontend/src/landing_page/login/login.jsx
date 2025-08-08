@@ -85,7 +85,7 @@ function Login() {
             if (success) {
                 handleSuccess(message);
                 setTimeout(() => {
-                    window.location.href = "http://localhost:5173/dashboard";
+                    window.location.href = `${import.meta.env.VITE_DASHBOARD_URL}/`;
                 }, 1000);
             } else {
                 if (message && message.toLowerCase().includes('user not found') || 
