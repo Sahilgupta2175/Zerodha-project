@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "./SignUp.css";
 
 function SignUp() {
-    const navigate = useNavigate();
     const [inputValue, setInputValue] = useState({
         email: "",
         password: "",
@@ -93,7 +92,8 @@ function SignUp() {
             if (success) {
                 handleSuccess(message);
                 setTimeout(() => {
-                    navigate("/login");
+                    // Redirect to dashboard after successful signup
+                    window.location.href = `${import.meta.env.VITE_DASHBOARD_URL}/`;
                 }, 1000);
             } else {
                 handleError(message);
