@@ -15,7 +15,7 @@ const authRoute = require('./Routes/AuthRoute');
 
 // Configure CORS to allow frontend
 app.use(cors({
-    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176"],
+    origin: ["https://zerodha-dashboard-sg.vercel.app/"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"]
