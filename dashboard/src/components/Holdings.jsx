@@ -6,88 +6,75 @@ function Holdings() {
     const [allHoldings, setAllHoldings] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showDetailedChart, setShowDetailedChart] = useState(false);
+    const [dataSource, setDataSource] = useState('database'); // 'database' or 'live'
 
     useEffect(() => {
-        const fetchDatabaseHoldings = async () => {
-            try {
-                setLoading(true);
-                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/allHoldings`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setAllHoldings(data);
-                }
-            } catch {
-                setAllHoldings([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchDatabaseHoldings();
     }, []);
+
+    const fetchDatabaseHoldings = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/allHoldings`);
+            if (response.ok) {
+                const data = await response.json();
+                
+                // Remove duplicates on frontend as additional safety
+                const uniqueHoldings = data.reduce((acc, current) => {
+                    const existingIndex = acc.findIndex(holding => holding.name === current.name);
+                    if (existingIndex === -1) {
+                        acc.push(current);
+                    } else {
+                        // Keep the one with higher _id (more recent)
+                        if (current._id > acc[existingIndex]._id) {
+                            acc[existingIndex] = current;
+                        }
+                    }
+                    return acc;
+                }, []);
+                
+                setAllHoldings(uniqueHoldings);
+                setDataSource('database');
+            }
+        } catch {
+            setAllHoldings([]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const loadAllStocks = async () => {
         try {
             setLoading(true);
             
-            try {
-                const API_KEY = import.meta.env.VITE_ALPHA_VANTAGE_API_KEY || import.meta.VITE_MARKET_API_KEY;
-                
-                const liveHoldings = [
-                    { name: 'RELIANCE INDUSTRIES', symbol: 'RELIANCE', price: 2945.60, change: '+1.2%' },
-                    { name: 'TATA CONSULTANCY SERVICES', symbol: 'TCS', price: 3142.30, change: '+0.8%' },
-                    { name: 'INFOSYS LIMITED', symbol: 'INFY', price: 1528.45, change: '-0.5%' },
-                    { name: 'HDFC BANK LIMITED', symbol: 'HDFCBANK', price: 1652.80, change: '+2.1%' },
-                    { name: 'BHARTI AIRTEL LIMITED', symbol: 'BHARTIARTL', price: 1015.25, change: '+1.8%' },
-                    { name: 'INDIAN TOBACCO COMPANY', symbol: 'ITC', price: 392.70, change: '-0.3%' },
-                    { name: 'STATE BANK OF INDIA', symbol: 'SBIN', price: 515.90, change: '+0.9%' },
-                    { name: 'WIPRO LIMITED', symbol: 'WIPRO', price: 408.15, change: '-1.2%' },
-                    { name: 'KOTAK MAHINDRA BANK', symbol: 'KOTAKBANK', price: 1745.50, change: '+1.5%' },
-                    { name: 'ASIAN PAINTS LIMITED', symbol: 'ASIANPAINT', price: 2835.40, change: '+0.7%' },
-                    { name: 'MARUTI SUZUKI INDIA', symbol: 'MARUTI', price: 10180.25, change: '-0.8%' },
-                    { name: 'ULTRATECH CEMENT', symbol: 'ULTRACEMCO', price: 8920.15, change: '+1.3%' },
-                    { name: 'TITAN COMPANY LIMITED', symbol: 'TITAN', price: 3420.60, change: '+2.4%' },
-                    { name: 'NESTLE INDIA LIMITED', symbol: 'NESTLEIND', price: 18450.80, change: '+0.6%' },
-                    { name: 'HCL TECHNOLOGIES', symbol: 'HCLTECH', price: 1785.30, change: '-0.4%' },
-                    { name: 'LARSEN & TOUBRO', symbol: 'LT', price: 3280.90, change: '+1.1%' },
-                    { name: 'TECH MAHINDRA LIMITED', symbol: 'TECHM', price: 1640.75, change: '-0.9%' },
-                    { name: 'POWER GRID CORPORATION', symbol: 'POWERGRID', price: 285.45, change: '+0.5%' },
-                    { name: 'NTPC LIMITED', symbol: 'NTPC', price: 378.20, change: '+0.8%' },
-                    { name: 'ICICI BANK LIMITED', symbol: 'ICICIBANK', price: 1185.60, change: '+1.4%' }
-                ].map(stock => ({
-                    name: stock.name,
-                    symbol: stock.symbol,
-                    qty: Math.floor(Math.random() * 100) + 1,
-                    avg: stock.price * (0.92 + Math.random() * 0.16),
-                    price: stock.price + (Math.random() - 0.5) * (stock.price * 0.03),
-                    net: stock.change,
-                    day: (Math.random() > 0.6 ? '+' : '-') + (Math.random() * 3).toFixed(2) + '%',
-                    isLoss: stock.change.startsWith('-'),
-                    isLiveData: true,
-                    lastUpdated: new Date().toISOString()
-                }));
-                
-                setAllHoldings(liveHoldings);
-                
-            } catch {
-                const demoData = [
-                    { name: 'RELIANCE INDUSTRIES', price: 2950.75 },
-                    { name: 'TATA CONSULTANCY SERVICES', price: 3125.50 },
-                    { name: 'INFOSYS LIMITED', price: 1520.25 }
-                ].map(stock => ({
-                    name: stock.name,
-                    qty: Math.floor(Math.random() * 50) + 1,
-                    avg: stock.price * (0.95 + Math.random() * 0.1),
-                    price: stock.price,
-                    net: '+' + (Math.random() * 5).toFixed(2) + '%',
-                    day: '+' + (Math.random() * 2).toFixed(2) + '%',
-                    isLoss: false,
-                    isLiveData: true
-                }));
-                
-                setAllHoldings(demoData);
-            }
+            const liveHoldings = [
+                { name: 'RELIANCE INDUSTRIES', symbol: 'RELIANCE', price: 2945.60, change: '+1.2%' },
+                { name: 'TATA CONSULTANCY SERVICES', symbol: 'TCS', price: 3142.30, change: '+0.8%' },
+                { name: 'INFOSYS LIMITED', symbol: 'INFY', price: 1528.45, change: '-0.5%' },
+                { name: 'HDFC BANK LIMITED', symbol: 'HDFCBANK', price: 1652.80, change: '+2.1%' },
+                { name: 'BHARTI AIRTEL LIMITED', symbol: 'BHARTIARTL', price: 1015.25, change: '+1.8%' },
+                { name: 'INDIAN TOBACCO COMPANY', symbol: 'ITC', price: 392.70, change: '-0.3%' },
+                { name: 'STATE BANK OF INDIA', symbol: 'SBIN', price: 515.90, change: '+0.9%' },
+                { name: 'WIPRO LIMITED', symbol: 'WIPRO', price: 408.15, change: '-1.2%' },
+                { name: 'KOTAK MAHINDRA BANK', symbol: 'KOTAKBANK', price: 1745.50, change: '+1.5%' },
+                { name: 'ASIAN PAINTS LIMITED', symbol: 'ASIANPAINT', price: 2835.40, change: '+0.7%' }
+            ].map((stock, index) => ({
+                _id: `live_${index}`,
+                name: stock.name,
+                symbol: stock.symbol,
+                qty: Math.floor(Math.random() * 100) + 1,
+                avg: stock.price * (0.92 + Math.random() * 0.16),
+                price: stock.price + (Math.random() - 0.5) * (stock.price * 0.03),
+                net: stock.change,
+                day: (Math.random() > 0.6 ? '+' : '-') + (Math.random() * 3).toFixed(2) + '%',
+                isLoss: stock.change.startsWith('-'),
+                isLiveData: true,
+                lastUpdated: new Date().toISOString()
+            }));
             
+            setAllHoldings(liveHoldings);
+            setDataSource('live');
+                
         } catch {
             setAllHoldings([]);
         } finally {
@@ -98,7 +85,10 @@ function Holdings() {
     return (
         <>
             <h3 className="title">
-                Holdings ({allHoldings.length})
+                Holdings ({allHoldings.length}) 
+                <span style={{fontSize: '12px', color: '#666', marginLeft: '10px'}}>
+                    {dataSource === 'database' ? '(Database)' : '(Live Demo)'}
+                </span>
                 {loading && <span style={{fontSize: '12px', color: '#666'}}> (Loading...)</span>}
             </h3>
 
@@ -120,18 +110,19 @@ function Holdings() {
                     Load All Stocks (Live)
                 </button>
                 <button 
-                    onClick={() => window.location.reload()}
+                    onClick={fetchDatabaseHoldings}
+                    disabled={loading}
                     style={{
                         padding: '8px 16px',
                         backgroundColor: '#28a745',
                         color: 'white',
                         border: 'none',
                         borderRadius: '5px',
-                        cursor: 'pointer',
+                        cursor: loading ? 'not-allowed' : 'pointer',
                         fontSize: '12px'
                     }}
                 >
-                    Reset to Database
+                    Load Database Holdings
                 </button>
             </div>
 
@@ -157,7 +148,7 @@ function Holdings() {
                         const dayClass = stock.isLoss ? "loss" : "profit";
 
                         return (
-                            <tr key={index} style={{ 
+                            <tr key={stock._id || `stock-${index}`} style={{ 
                                 backgroundColor: stock.isLiveData ? '#f0fff0' : 'white',
                                 borderLeft: stock.isLiveData ? '3px solid #28a745' : 'none'
                             }}>

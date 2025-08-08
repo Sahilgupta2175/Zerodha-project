@@ -13,7 +13,22 @@ function Positions() {
                 const response = await fetch(`${backendUrl}/allPositions`);
                 if (response.ok) {
                     const data = await response.json();
-                    setAllPositions(data);
+                    
+                    // Remove duplicates on frontend as additional safety
+                    const uniquePositions = data.reduce((acc, current) => {
+                        const existingIndex = acc.findIndex(position => position.name === current.name);
+                        if (existingIndex === -1) {
+                            acc.push(current);
+                        } else {
+                            // Keep the one with higher _id (more recent)
+                            if (current._id > acc[existingIndex]._id) {
+                                acc[existingIndex] = current;
+                            }
+                        }
+                        return acc;
+                    }, []);
+                    
+                    setAllPositions(uniquePositions);
                 }
             } catch {
                 setAllPositions([]);
@@ -50,7 +65,7 @@ function Positions() {
                         const dayClass = stock.isLoss ? "loss" : "profit";
 
                         return (
-                            <tr key={index}>
+                            <tr key={stock._id || `position-${index}`}>
                                 <td>{stock.product}</td>
                                 <td>{stock.name}</td>
                                 <td>{stock.qty}.</td>

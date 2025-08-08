@@ -41,7 +41,19 @@ app.get('/allHoldings', async (req, res) => {
     try {
         await connectDB();
         let allHoldings = await Holdings.find({});
-        res.json(allHoldings);
+        
+        // Remove duplicates by name, keep the most recent one
+        const uniqueHoldings = [];
+        const seenNames = new Set();
+        
+        for (const holding of allHoldings) {
+            if (!seenNames.has(holding.name)) {
+                uniqueHoldings.push(holding);
+                seenNames.add(holding.name);
+            }
+        }
+        
+        res.json(uniqueHoldings);
     } catch (error) {
         res.status(500).json({ error: "Failed to fetch holdings" });
     }
@@ -60,6 +72,7 @@ app.post('/newOrder', async (req, res) => {
         await newOrder.save();
         
         if (mode === "BUY") {
+            await connectDB();
             const existingHolding = await Holdings.findOne({ name: name });
             
             if (existingHolding) {
@@ -67,10 +80,14 @@ app.post('/newOrder', async (req, res) => {
                 const totalValue = (existingHolding.avg * existingHolding.qty) + (parseFloat(price) * parseInt(qty));
                 const newAvg = totalValue / totalQty;
                 
-                existingHolding.qty = totalQty;
-                existingHolding.avg = newAvg;
-                existingHolding.price = parseFloat(price);
-                await existingHolding.save();
+                await Holdings.updateOne(
+                    { name: name },
+                    { 
+                        qty: totalQty,
+                        avg: newAvg,
+                        price: parseFloat(price)
+                    }
+                );
             } else {
                 const newHolding = new Holdings({
                     name: name,
@@ -83,16 +100,22 @@ app.post('/newOrder', async (req, res) => {
                 await newHolding.save();
             }
         } else if (mode === "SELL") {
+            await connectDB();
             const existingHolding = await Holdings.findOne({ name: name });
             
             if (existingHolding && existingHolding.qty >= parseInt(qty)) {
-                existingHolding.qty -= parseInt(qty);
-                existingHolding.price = parseFloat(price);
+                const newQty = existingHolding.qty - parseInt(qty);
                 
-                if (existingHolding.qty === 0) {
+                if (newQty === 0) {
                     await Holdings.deleteOne({ name: name });
                 } else {
-                    await existingHolding.save();
+                    await Holdings.updateOne(
+                        { name: name },
+                        { 
+                            qty: newQty,
+                            price: parseFloat(price)
+                        }
+                    );
                 }
             } else {
                 return res.status(400).json({ error: "Insufficient holdings to sell" });
@@ -117,9 +140,83 @@ app.get('/allOrders', async (req, res) => {
 app.get('/allPositions', async (req, res) => {
     try {
         let allPositions = await Positions.find({});
-        res.json(allPositions);
+        
+        // Remove duplicates by name, keep the most recent one
+        const uniquePositions = [];
+        const seenNames = new Set();
+        
+        for (const position of allPositions) {
+            if (!seenNames.has(position.name)) {
+                uniquePositions.push(position);
+                seenNames.add(position.name);
+            }
+        }
+        
+        res.json(uniquePositions);
     } catch (error) {
         res.status(500).json({ error: "Failed to fetch positions" });
+    }
+});
+
+app.post('/cleanup-duplicates', async (req, res) => {
+    try {
+        await connectDB();
+        
+        // Clean up duplicate holdings
+        const allHoldings = await Holdings.find({});
+        const holdingsMap = new Map();
+        const duplicateHoldings = [];
+        
+        for (const holding of allHoldings) {
+            if (holdingsMap.has(holding.name)) {
+                // Mark for deletion - keep the latest one
+                const existing = holdingsMap.get(holding.name);
+                if (holding._id > existing._id) {
+                    duplicateHoldings.push(existing._id);
+                    holdingsMap.set(holding.name, holding);
+                } else {
+                    duplicateHoldings.push(holding._id);
+                }
+            } else {
+                holdingsMap.set(holding.name, holding);
+            }
+        }
+        
+        // Remove duplicates
+        if (duplicateHoldings.length > 0) {
+            await Holdings.deleteMany({ _id: { $in: duplicateHoldings } });
+        }
+        
+        // Clean up duplicate positions
+        const allPositions = await Positions.find({});
+        const positionsMap = new Map();
+        const duplicatePositions = [];
+        
+        for (const position of allPositions) {
+            if (positionsMap.has(position.name)) {
+                const existing = positionsMap.get(position.name);
+                if (position._id > existing._id) {
+                    duplicatePositions.push(existing._id);
+                    positionsMap.set(position.name, position);
+                } else {
+                    duplicatePositions.push(position._id);
+                }
+            } else {
+                positionsMap.set(position.name, position);
+            }
+        }
+        
+        if (duplicatePositions.length > 0) {
+            await Positions.deleteMany({ _id: { $in: duplicatePositions } });
+        }
+        
+        res.json({ 
+            message: "Duplicates cleaned up successfully",
+            removedHoldings: duplicateHoldings.length,
+            removedPositions: duplicatePositions.length
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to clean up duplicates" });
     }
 });
 
