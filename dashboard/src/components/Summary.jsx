@@ -1,11 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './Summary.css';
+import axios from 'axios';
 
 function Summary() {
+    const [user, setUser] = useState({ username: 'User' });
+
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            try {
+                const response = await axios.post(
+                    `${import.meta.env.VITE_BACKEND_URL}/verify`,
+                    {},
+                    { withCredentials: true }
+                );
+                
+                if (response.data.status) {
+                    setUser({ username: response.data.user });
+                }
+            } catch (error) {
+                console.error('Error fetching user info:', error);
+            }
+        };
+
+        fetchUserInfo();
+    }, []);
     return (
         <>
             <div className="username">
-                <h6>Hi, User!</h6>
+                <h6>Hi, {user.username}!</h6>
                 <hr className="divider" />
             </div>
             <div className="section">

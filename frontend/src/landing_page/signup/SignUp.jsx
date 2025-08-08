@@ -90,11 +90,11 @@ function SignUp() {
             const { success, message } = data;
 
             if (success) {
-                handleSuccess(message);
+                handleSuccess("Account created successfully! Redirecting to dashboard...");
                 setTimeout(() => {
                     // Redirect to dashboard after successful signup
                     window.location.href = `${import.meta.env.VITE_DASHBOARD_URL}/`;
-                }, 1000);
+                }, 1500);
             } else {
                 handleError(message);
             }

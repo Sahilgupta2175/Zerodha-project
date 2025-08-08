@@ -1,10 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Menu.css';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { useCookies } from 'react-cookie';
 
 function Menu() {
     const [selectedMenu, setSelectedMenu] = useState(0);
     const [isProfileDropDownOpen, setIsProfileDropDownOpen] = useState(false);
+    const [user, setUser] = useState({ username: 'User', email: '' });
+    const [cookies] = useCookies(['token']);
+
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            try {
+                const response = await axios.post(
+                    `${import.meta.env.VITE_BACKEND_URL}/verify`,
+                    {},
+                    { withCredentials: true }
+                );
+                
+                if (response.data.status) {
+                    setUser({
+                        username: response.data.user,
+                        email: response.data.email,
+                        userId: response.data.userId
+                    });
+                } else {
+                    console.log('User verification failed:', response.data.message);
+                }
+            } catch (error) {
+                console.error('Error fetching user info:', error);
+            }
+        };
+
+        fetchUserInfo();
+    }, []);
+
+    const getInitials = (username) => {
+        if (!username) return 'U';
+        const names = username.split(' ');
+        if (names.length >= 2) {
+            return (names[0][0] + names[1][0]).toUpperCase();
+        }
+        return username.substring(0, 2).toUpperCase();
+    };
 
     const handleMenuClick = (index) => {
         setSelectedMenu(index);
@@ -55,10 +94,19 @@ function Menu() {
                 </ul>
                 <hr />
                 <div className="profile" onClick={handleProfileClick}>
-                    <div className="avatar">ZU</div>
-                    <p className="username">USERID</p>
+                    <div className="avatar">{getInitials(user.username)}</div>
+                    <p className="username">{user.username}</p>
                 </div>
-                {isProfileDropDownOpen}
+                {isProfileDropDownOpen && (
+                    <div className="profile-dropdown">
+                        <p>{user.email}</p>
+                        <button onClick={() => {
+                            // Add logout functionality here
+                            document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                            window.location.href = import.meta.env.VITE_FRONTEND_URL || '/';
+                        }}>Logout</button>
+                    </div>
+                )}
             </div>
         </div>
     );
