@@ -5,12 +5,6 @@ import { ToastContainer, toast } from "react-toastify";
 import "./login.css";
 
 function Login() {
-    console.log('Login component environment check:', {
-        BACKEND_URL: import.meta.env.VITE_BACKEND_URL,
-        DASHBOARD_URL: import.meta.env.VITE_DASHBOARD_URL,
-        MODE: import.meta.env.MODE
-    });
-    
     const navigate = useNavigate();
     const [inputValue, setInputValue] = useState({
         email: "",
@@ -89,14 +83,9 @@ function Login() {
             const { success, message } = data;
 
             if (success) {
-                console.log("Login successful, preparing redirect...");
-                console.log("Dashboard URL:", import.meta.env.VITE_DASHBOARD_URL);
-                
                 handleSuccess(message);
                 setTimeout(() => {
-                    const dashboardUrl = import.meta.env.VITE_DASHBOARD_URL || 'https://zerodha-dashboard-sg.vercel.app';
-                    console.log("Redirecting to:", dashboardUrl);
-                    window.location.href = dashboardUrl;
+                    window.location.href = 'https://zerodha-dashboard-sg.vercel.app';
                 }, 1000);
             } else {
                 if (message && message.toLowerCase().includes('user not found') || 

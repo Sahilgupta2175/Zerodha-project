@@ -3,36 +3,31 @@ import './Summary.css';
 import axios from 'axios';
 
 function Summary() {
-    const [user, setUser] = useState({ username: 'User' });
+    const [user, setUser] = useState({ username: 'Sahil' });
 
     useEffect(() => {
+        // Try to fetch user info, but don't block the UI if it fails
         const fetchUserInfo = async () => {
             try {
                 const backendUrl = import.meta.env.VITE_BACKEND_URL;
                 
-                if (!backendUrl) {
-                    console.error('VITE_BACKEND_URL is not defined in Summary');
-                    setUser({ username: 'Guest User' });
-                    return;
-                }
-
-                const response = await axios.post(
-                    `${backendUrl}/verify`,
-                    {},
-                    { 
-                        withCredentials: true,
-                        timeout: 10000
+                if (backendUrl) {
+                    const response = await axios.post(
+                        `${backendUrl}/verify`,
+                        {},
+                        { 
+                            withCredentials: true,
+                            timeout: 5000
+                        }
+                    );
+                    
+                    if (response.data.status) {
+                        setUser({ username: response.data.user });
                     }
-                );
-                
-                if (response.data.status) {
-                    setUser({ username: response.data.user });
-                } else {
-                    setUser({ username: 'Guest User' });
                 }
-            } catch (error) {
-                console.error('Error fetching user info:', error);
-                setUser({ username: 'Guest User' });
+            } catch {
+                // Silently fail - keep default user
+                console.log('Using default user name');
             }
         };
 

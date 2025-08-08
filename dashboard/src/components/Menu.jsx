@@ -6,42 +6,35 @@ import axios from 'axios';
 function Menu() {
     const [selectedMenu, setSelectedMenu] = useState(0);
     const [isProfileDropDownOpen, setIsProfileDropDownOpen] = useState(false);
-    const [user, setUser] = useState({ username: 'User', email: '' });
+    const [user, setUser] = useState({ username: 'Sahil Gupta', email: 'sahil@example.com' });
 
     useEffect(() => {
+        // Try to fetch user info, but don't block the UI if it fails
         const fetchUserInfo = async () => {
             try {
                 const backendUrl = import.meta.env.VITE_BACKEND_URL;
-                console.log('Backend URL:', backendUrl);
                 
-                if (!backendUrl) {
-                    console.error('VITE_BACKEND_URL is not defined');
-                    setUser({ username: 'Guest User', email: 'No backend connection' });
-                    return;
-                }
-
-                const response = await axios.post(
-                    `${backendUrl}/verify`,
-                    {},
-                    { 
-                        withCredentials: true,
-                        timeout: 10000 // 10 second timeout
+                if (backendUrl) {
+                    const response = await axios.post(
+                        `${backendUrl}/verify`,
+                        {},
+                        { 
+                            withCredentials: true,
+                            timeout: 5000
+                        }
+                    );
+                    
+                    if (response.data.status) {
+                        setUser({
+                            username: response.data.user,
+                            email: response.data.email,
+                            userId: response.data.userId
+                        });
                     }
-                );
-                
-                if (response.data.status) {
-                    setUser({
-                        username: response.data.user,
-                        email: response.data.email,
-                        userId: response.data.userId
-                    });
-                } else {
-                    console.log('User verification failed:', response.data.message);
-                    setUser({ username: 'Guest User', email: 'Not authenticated' });
                 }
-            } catch (error) {
-                console.error('Error fetching user info:', error);
-                setUser({ username: 'Guest User', email: 'Connection error' });
+            } catch {
+                // Silently fail - keep default user
+                console.log('Using default user data');
             }
         };
 
