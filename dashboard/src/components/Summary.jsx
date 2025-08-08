@@ -6,7 +6,6 @@ function Summary() {
     const [user, setUser] = useState({ username: 'Sahil' });
 
     useEffect(() => {
-        // Try to fetch user info, but don't block the UI if it fails
         const fetchUserInfo = async () => {
             try {
                 const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -26,8 +25,7 @@ function Summary() {
                     }
                 }
             } catch {
-                // Silently fail - keep default user
-                console.log('Using default user name');
+                setUser({ username: 'Sahil' });
             }
         };
 

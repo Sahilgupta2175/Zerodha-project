@@ -7,13 +7,11 @@ function GeneralContent({ children }) {
     const [selectedStockUID, setSelectedStockUID] = useState("");
 
     const handleOpenBuyWindow = (uid) => {
-        console.log("Opening buy window for:", uid);
         setIsBuyWindowOpen(true);
         setSelectedStockUID(uid);
     };
 
     const handleCloseBuyWindow = () => {
-        console.log("Closing buy window");
         setIsBuyWindowOpen(false);
         setSelectedStockUID("");
     };

@@ -50,18 +50,16 @@ function BuyActionsWindow({ uid, price }) {
                 return;
             }
             
-            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/newOrder`, {
+            await axios.post(`${import.meta.env.VITE_BACKEND_URL}/newOrder`, {
                 name: uid,
                 qty: stockQuantity,
                 price: stockPrice,
                 mode: "BUY",
             });
             
-            console.log("Buy order placed:", response.data);
             alert(`Buy order placed successfully! Bought ${stockQuantity} shares of ${uid} at ₹${stockPrice.toFixed(2)} each.`);
             closeBuyWindow();
         } catch (error) {
-            console.error("Error placing buy order:", error);
             if (error.response) {
                 alert(`Failed to place buy order: ${error.response.data.error || error.response.data.message}`);
             } else {
@@ -72,11 +70,9 @@ function BuyActionsWindow({ uid, price }) {
 
     const handleSellClick = async () => {
         try {
-            // First, check if the stock exists in holdings
             const holdingsResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/allHoldings`);
             const holdings = holdingsResponse.data;
             
-            // Find the specific stock in holdings
             const stockInHoldings = holdings.find(holding => holding.name === uid);
             
             if (!stockInHoldings) {
@@ -84,25 +80,21 @@ function BuyActionsWindow({ uid, price }) {
                 return;
             }
             
-            // Check if user has enough quantity to sell
             if (stockInHoldings.qty < stockQuantity) {
                 alert(`Insufficient quantity. You only have ${stockInHoldings.qty} shares of ${uid}, but trying to sell ${stockQuantity}.`);
                 return;
             }
             
-            // Proceed with sell order if validation passes
-            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/newOrder`, {
+            await axios.post(`${import.meta.env.VITE_BACKEND_URL}/newOrder`, {
                 name: uid,
                 qty: stockQuantity,
                 price: stockPrice,
                 mode: "SELL",
             });
             
-            console.log("Sell order placed:", response.data);
             alert(`Sell order placed successfully! Sold ${stockQuantity} shares of ${uid} at ₹${stockPrice.toFixed(2)} each.`);
             closeBuyWindow();
         } catch (error) {
-            console.error("Error placing sell order:", error);
             if (error.response) {
                 alert(`Failed to place sell order: ${error.response.data.error || error.response.data.message}`);
             } else {

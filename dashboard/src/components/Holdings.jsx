@@ -15,11 +15,9 @@ function Holdings() {
                 if (response.ok) {
                     const data = await response.json();
                     setAllHoldings(data);
-                } else {
-                    console.error('Failed to fetch database holdings:', response.statusText);
                 }
-            } catch (error) {
-                console.error('Error fetching database holdings:', error);
+            } catch {
+                setAllHoldings([]);
             } finally {
                 setLoading(false);
             }
@@ -90,8 +88,8 @@ function Holdings() {
                 setAllHoldings(demoData);
             }
             
-        } catch (error) {
-            console.error('Error loading live stocks:', error);
+        } catch {
+            setAllHoldings([]);
         } finally {
             setLoading(false);
         }

@@ -9,7 +9,6 @@ function Menu() {
     const [user, setUser] = useState({ username: 'Sahil Gupta', email: 'sahil@example.com' });
 
     useEffect(() => {
-        // Try to fetch user info, but don't block the UI if it fails
         const fetchUserInfo = async () => {
             try {
                 const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -33,8 +32,7 @@ function Menu() {
                     }
                 }
             } catch {
-                // Silently fail - keep default user
-                console.log('Using default user data');
+                setUser({ username: 'User', email: 'user@example.com' });
             }
         };
 
@@ -106,7 +104,6 @@ function Menu() {
                     <div className="profile-dropdown">
                         <p>{user.email}</p>
                         <button onClick={() => {
-                            // Add logout functionality here
                             document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                             window.location.href = import.meta.env.VITE_FRONTEND_URL || '/';
                         }}>Logout</button>

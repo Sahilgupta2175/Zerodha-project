@@ -24,7 +24,6 @@ function Login() {
             [name]: value,
         });
         
-        // Clear error when user starts typing
         if (errors[name]) {
             setErrors({
                 ...errors,
@@ -72,14 +71,12 @@ function Login() {
         setIsLoading(true);
         
         try {
-            console.log("Attempting login with:", { email, password: "***" });
             const { data } = await axios.post(
                 `${import.meta.env.VITE_BACKEND_URL}/login`, 
                 { ...inputValue }, 
                 { withCredentials: true }
             );
             
-            console.log("Login response:", data);
             const { success, message } = data;
 
             if (success) {
@@ -101,11 +98,6 @@ function Login() {
                 }
             }
         } catch (error) {
-            console.error("Login error:", error);
-            console.error("Error details:", error.response?.data);
-            console.error("Error status:", error.response?.status);
-            console.error("Error message:", error.message);
-            
             const errorMessage = error.response?.data?.message || error.message || "Failed to login. Please check your credentials.";
             
             if (error.response?.status === 404 || 

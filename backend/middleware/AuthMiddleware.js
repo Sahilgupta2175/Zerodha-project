@@ -12,12 +12,10 @@ const userVerification = async (req, res) => {
 
     jwt.verify(token, process.env.TOKEN_KEY, async (err, data) => {
         if(err) {
-            console.log("JWT verification error:", err.message);
             return res.json({ status: false, message: "Invalid token" });
         }
         
         try {
-            // Ensure database connection
             await connectDB();
             
             const user = await User.findById(data.id);
@@ -32,7 +30,6 @@ const userVerification = async (req, res) => {
                 return res.json({ status: false, message: "User not found" });
             }
         } catch (error) {
-            console.log("Database error:", error);
             return res.json({ status: false, message: "Database error" });
         }
     });

@@ -23,7 +23,6 @@ function SignUp() {
             [name]: value,
         });
         
-        // Clear error when user starts typing
         if (errors[name]) {
             setErrors({
                 ...errors,
@@ -79,14 +78,12 @@ function SignUp() {
         setIsLoading(true);
         
         try {
-            console.log("Attempting signup with:", { email, username, password: "***" });
             const { data } = await axios.post(
                 `${import.meta.env.VITE_BACKEND_URL}/signup`, 
                 { ...inputValue }, 
                 { withCredentials: true }
             );
             
-            console.log("Signup response:", data);
             const { success, message } = data;
 
             if (success) {
@@ -98,15 +95,9 @@ function SignUp() {
                 handleError(message);
             }
         } catch (error) {
-            console.error("Signup error:", error);
-            console.error("Error details:", error.response?.data);
-            console.error("Error status:", error.response?.status);
-            console.error("Error message:", error.message);
-            
             const errorMessage = error.response?.data?.message || error.message || "Failed to create account. Please try again.";
             handleError(errorMessage);
             
-            // Also show an alert for immediate visibility
             alert(`Signup failed: ${errorMessage}`);
         } finally {
             setIsLoading(false);

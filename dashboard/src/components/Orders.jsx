@@ -11,17 +11,13 @@ function Orders() {
             try {
                 setLoading(true);
                 const backendUrl = import.meta.env.VITE_BACKEND_URL;
-                console.log('Fetching orders from:', `${backendUrl}/allOrders`);
                 const response = await fetch(`${backendUrl}/allOrders`);
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('Orders data received:', data);
                     setAllOrders(data);
-                } else {
-                    console.error('Failed to fetch orders:', response.statusText);
                 }
-            } catch (error) {
-                console.error('Orders fetch error:', error);
+            } catch {
+                setAllOrders([]);
             } finally {
                 setLoading(false);
             }

@@ -10,17 +10,13 @@ function Positions() {
             try {
                 setLoading(true);
                 const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
-                console.log('Fetching positions from:', `${backendUrl}/allPositions`);
                 const response = await fetch(`${backendUrl}/allPositions`);
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('Positions data received:', data);
                     setAllPositions(data);
-                } else {
-                    console.error('Failed to fetch positions:', response.statusText);
                 }
-            } catch (error) {
-                console.error('Positions fetch error:', error);
+            } catch {
+                setAllPositions([]);
             } finally {
                 setLoading(false);
             }
