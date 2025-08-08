@@ -8,17 +8,31 @@ function Summary() {
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
+                const backendUrl = import.meta.env.VITE_BACKEND_URL;
+                
+                if (!backendUrl) {
+                    console.error('VITE_BACKEND_URL is not defined in Summary');
+                    setUser({ username: 'Guest User' });
+                    return;
+                }
+
                 const response = await axios.post(
-                    `${import.meta.env.VITE_BACKEND_URL}/verify`,
+                    `${backendUrl}/verify`,
                     {},
-                    { withCredentials: true }
+                    { 
+                        withCredentials: true,
+                        timeout: 10000
+                    }
                 );
                 
                 if (response.data.status) {
                     setUser({ username: response.data.user });
+                } else {
+                    setUser({ username: 'Guest User' });
                 }
             } catch (error) {
                 console.error('Error fetching user info:', error);
+                setUser({ username: 'Guest User' });
             }
         };
 

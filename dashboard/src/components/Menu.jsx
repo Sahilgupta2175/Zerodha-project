@@ -2,21 +2,31 @@ import React, { useState, useEffect } from 'react';
 import './Menu.css';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { useCookies } from 'react-cookie';
 
 function Menu() {
     const [selectedMenu, setSelectedMenu] = useState(0);
     const [isProfileDropDownOpen, setIsProfileDropDownOpen] = useState(false);
     const [user, setUser] = useState({ username: 'User', email: '' });
-    const [cookies] = useCookies(['token']);
 
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
+                const backendUrl = import.meta.env.VITE_BACKEND_URL;
+                console.log('Backend URL:', backendUrl);
+                
+                if (!backendUrl) {
+                    console.error('VITE_BACKEND_URL is not defined');
+                    setUser({ username: 'Guest User', email: 'No backend connection' });
+                    return;
+                }
+
                 const response = await axios.post(
-                    `${import.meta.env.VITE_BACKEND_URL}/verify`,
+                    `${backendUrl}/verify`,
                     {},
-                    { withCredentials: true }
+                    { 
+                        withCredentials: true,
+                        timeout: 10000 // 10 second timeout
+                    }
                 );
                 
                 if (response.data.status) {
@@ -27,9 +37,11 @@ function Menu() {
                     });
                 } else {
                     console.log('User verification failed:', response.data.message);
+                    setUser({ username: 'Guest User', email: 'Not authenticated' });
                 }
             } catch (error) {
                 console.error('Error fetching user info:', error);
+                setUser({ username: 'Guest User', email: 'Connection error' });
             }
         };
 
