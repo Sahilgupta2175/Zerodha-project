@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 
 const dbURL = process.env.ATLAS_DB_URL; 
 
+console.log('Database URL check:', dbURL ? 'URL provided' : 'URL missing');
+
 // Connection options to handle timeouts and improve reliability
 const connectionOptions = {
     bufferCommands: false,
@@ -16,12 +18,17 @@ const connectionOptions = {
 main().then(() => {
     console.log('MongoDB connected successfully');
 }).catch((err) => {
-    console.log('MongoDB connection error:', err);
-    process.exit(1);
+    console.error('MongoDB connection error:', err);
+    // Don't exit process in serverless environment
+    // process.exit(1);
 });
 
 async function main() {
     try {
+        if (!dbURL) {
+            throw new Error('ATLAS_DB_URL environment variable is not set');
+        }
+        
         await mongoose.connect(dbURL, connectionOptions);
         
         // Handle connection events

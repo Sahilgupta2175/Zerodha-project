@@ -62,6 +62,29 @@ app.get('/health', (req, res) => {
     });
 });
 
+// Database connectivity test endpoint
+app.get('/db-test', async (req, res) => {
+    try {
+        const mongoose = require('mongoose');
+        const dbState = mongoose.connection.readyState;
+        const states = ['disconnected', 'connected', 'connecting', 'disconnecting'];
+        
+        res.json({
+            status: 'OK',
+            database: {
+                state: states[dbState] || 'unknown',
+                stateCode: dbState,
+                hasUrl: !!process.env.ATLAS_DB_URL
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'Error',
+            error: error.message
+        });
+    }
+});
+
 // Adding Holdings Sample Data Route
 app.get("/addHoldings", async (req, res) => {
     try {
