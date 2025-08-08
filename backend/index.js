@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 8080;
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const connectDB = require("./config/mongoConnection");
@@ -15,7 +15,12 @@ const authRoute = require('./Routes/AuthRoute');
 
 // Configure CORS to allow frontend
 app.use(cors({
-    origin: ["https://zerodha-dashboard-sg.vercel.app/"],
+    origin: [
+        "https://zerodha-dashboard-sg.vercel.app", 
+        "https://zerodha-sg.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:3000"
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"]
