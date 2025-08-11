@@ -1,4 +1,4 @@
-# Zerodha Clone API Documentation
+# Zerodha API Documentation
 
 ## Table of Contents
 - [Overview](#overview)
