@@ -630,4 +630,4 @@ For any questions or issues regarding this API:
 
 ---
 
-*This documentation covers all available endpoints and functionality of the Zerodha Clone API. Keep this document updated as new features are added.*
+*This documentation covers all available endpoints and functionality of the Zerodha API. Keep this document updated as new features are added.*
